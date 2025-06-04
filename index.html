@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Topics Blog Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            padding: 5px;
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 0 5px;
+        }
+
+        .nav-tab.active {
+            background: rgba(255,255,255,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .nav-tab:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-container {
+            background: rgba(255,255,255,0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            color: #d63031;
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .blog-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .blog-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+        }
+
+        .blog-card h3 {
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+            line-height: 1.4;
+        }
+
+        .blog-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .category-tag {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .blog-content {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            max-height: 100px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .blog-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .search-container {
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 15px;
+            font-size: 1rem;
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(10px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+
+            .blog-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Social Topics Blog</h1>
+            <p>Share your thoughts on important social issues</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-tab="read">📖 Read Posts</button>
+            <button class="nav-tab" data-tab="create">✍️ Create Post</button>
+            <button class="nav-tab" data-tab="manage">⚙️ Manage Posts</button>
+        </div>
+
+        <!-- Read Posts Section -->
+        <div class="content-section active" id="read">
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="🔍 Search posts by title, category, or content..." id="searchInput">
+            </div>
+            <div class="blog-grid" id="blogGrid">
+                <!-- Blog posts will be displayed here -->
+            </div>
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <div style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;">📝</div>
+                <h3>No posts found</h3>
+                <p>Be the first to share your thoughts on social topics!</p>
+            </div>
+        </div>
+
+        <!-- Create Post Section -->
+        <div class="content-section" id="create">
+            <div class="form-container">
+                <h2 style="margin-bottom: 25px; color: #333;">Create New Post</h2>
+                <form id="createForm">
+                    <div class="form-group">
+                        <label for="title">Post Title</label>
+                        <input type="text" id="title" name="title" required placeholder="Enter a compelling title...">
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" name="category" required>
+                            <option value="">Select a category</option>
+                            <option value="Social Justice">Social Justice</option>
+                            <option value="Environment">Environment</option>
+                            <option value="Education">Education</option>
+                            <option value="Healthcare">Healthcare</option>
+                            <option value="Technology & Society">Technology & Society</option>
+                            <option value="Human Rights">Human Rights</option>
+                            <option value="Community">Community</option>
+                            <option value="Politics">Politics</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="content">Content</label>
+                        <textarea id="content" name="content" required placeholder="Share your thoughts and insights..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="author">Author Name</label>
+                        <input type="text" id="author" name="author" required placeholder="Your name">
+                    </div>
+                    <button type="submit" class="btn">Publish Post</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Manage Posts Section -->
+        <div class="content-section" id="manage">
+            <div class="form-container">
+                <h2 style="margin-bottom: 25px; color: #333;">Manage Your Posts</h2>
+                <div class="blog-grid" id="manageGrid">
+                    <!-- Manageable posts will be displayed here -->
+                </div>
+                <div class="empty-state" id="manageEmptyState" style="display: none;">
+                    <div style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;">📋</div>
+                    <h3>No posts to manage</h3>
+                    <p>Create some posts first to see them here!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for reading full post -->
+    <div class="modal" id="readModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('readModal')">&times;</button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- Modal for editing post -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('editModal')">&times;</button>
+            <h2 style="margin-bottom: 25px; color: #333;">Edit Post</h2>
+            <form id="editForm">
+                <div class="form-group">
+                    <label for="editTitle">Post Title</label>
+                    <input type="text" id="editTitle" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="editCategory">Category</label>
+                    <select id="editCategory" name="category" required>
+                        <option value="Social Justice">Social Justice</option>
+                        <option value="Environment">Environment</option>
+                        <option value="Education">Education</option>
+                        <option value="Healthcare">Healthcare</option>
+                        <option value="Technology & Society">Technology & Society</option>
+                        <option value="Human Rights">Human Rights</option>
+                        <option value="Community">Community</option>
+                        <option value="Politics">Politics</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editContent">Content</label>
+                    <textarea id="editContent" name="content" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editAuthor">Author Name</label>
+                    <input type="text" id="editAuthor" name="author" required>
+                </div>
+                <button type="submit" class="btn">Update Post</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('editModal')">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let blogs = [];
+        let currentEditId = null;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBlogsFromStorage();
+            displayBlogs();
+            displayManageBlogs();
+            
+            // Add some sample data if no blogs exist
+            if (blogs.length === 0) {
+                addSampleData();
+            }
+        });
+
+        // Tab navigation
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const targetTab = this.getAttribute('data-tab');
+                switchTab(targetTab);
+            });
+        });
+
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+            // Update content sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+
+            // Refresh manage section when switched to
+            if (tabName === 'manage') {
+                displayManageBlogs();
+            }
+        }
+
+        // Create post form submission
+        document.getElementById('createForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const newBlog = {
+                id: Date.now(),
+                title: formData.get('title'),
+                category: formData.get('category'),
+                content: formData.get('content'),
+                author: formData.get('author'),
+                date: new Date().toLocaleDateString(),
+                timestamp: new Date().toISOString()
+            };
+
+            blogs.unshift(newBlog);
+            saveBlogsToStorage();
+            displayBlogs();
+            displayManageBlogs();
+            
+            // Reset form and show success
+            this.reset();
+            alert('Post published successfully!');
+            switchTab('read');
+        });
+
+        // Edit post form submission
+        document.getElementById('editForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const blogIndex = blogs.findIndex(blog => blog.id === currentEditId);
+            
+            if (blogIndex !== -1) {
+                blogs[blogIndex] = {
+                    ...blogs[blogIndex],
+                    title: formData.get('title'),
+                    category: formData.get('category'),
+                    content: formData.get('content'),
+                    author: formData.get('author')
+                };
+                
+                saveBlogsToStorage();
+                displayBlogs();
+                displayManageBlogs();
+                closeModal('editModal');
+                alert('Post updated successfully!');
+            }
+        });
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const filteredBlogs = blogs.filter(blog => 
+                blog.title.toLowerCase().includes(searchTerm) ||
+                blog.category.toLowerCase().includes(searchTerm) ||
+                blog.content.toLowerCase().includes(searchTerm) ||
+                blog.author.toLowerCase().includes(searchTerm)
+            );
+            displayBlogs(filteredBlogs);
+        });
+
+        // Display blogs in read section
+        function displayBlogs(blogsToShow = blogs) {
+            const blogGrid = document.getElementById('blogGrid');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (blogsToShow.length === 0) {
+                blogGrid.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            blogGrid.innerHTML = blogsToShow.map(blog => `
+                <div class="blog-card">
+                    <h3>${blog.title}</h3>
+                    <div class="blog-meta">
+                        <span class="category-tag">${blog.category}</span>
+                        <span>${blog.date}</span>
+                    </div>
+                    <div class="blog-content">
+                        ${blog.content.substring(0, 150)}${blog.content.length > 150 ? '...' : ''}
+                    </div>
+                    <p style="margin-bottom: 15px; color: #777; font-style: italic;">By ${blog.author}</p>
+                    <div class="blog-actions">
+                        <button class="btn btn-small" onclick="readFullPost(${blog.id})">Read Full Post</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Display blogs in manage section
+        function displayManageBlogs() {
+            const manageGrid = document.getElementById('manageGrid');
+            const emptyState = document.getElementById('manageEmptyState');
+            
+            if (blogs.length === 0) {
+                manageGrid.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            manageGrid.innerHTML = blogs.map(blog => `
+                <div class="blog-card">
+                    <h3>${blog.title}</h3>
+                    <div class="blog-meta">
+                        <span class="category-tag">${blog.category}</span>
+                        <span>${blog.date}</span>
+                    </div>
+                    <div class="blog-content">
+                        ${blog.content.substring(0, 100)}${blog.content.length > 100 ? '...' : ''}
+                    </div>
+                    <p style="margin-bottom: 15px; color: #777; font-style: italic;">By ${blog.author}</p>
+                    <div class="blog-actions">
+                        <button class="btn btn-small" onclick="editPost(${blog.id})">Edit</button>
+                        <button class="btn btn-small btn-danger" onclick="deletePost(${blog.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Read full post
+        function readFullPost(id) {
+            const blog = blogs.find(b => b.id === id);
+            if (blog) {
+                document.getElementById('modalContent').innerHTML = `
+                    <h2 style="color: #333; margin-bottom: 15px;">${blog.title}</h2>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #eee;">
+                        <span class="category-tag">${blog.category}</span>
+                        <span style="color: #666;">${blog.date}</span>
+                    </div>
+                    <div style="line-height: 1.8; color: #444; margin-bottom: 20px; white-space: pre-wrap;">${blog.content}</div>
+                    <p style="color: #777; font-style: italic; text-align: right;">— ${blog.author}</p>
+                `;
+                openModal('readModal');
+            }
+        }
+
+        // Edit post
+        function editPost(id) {
+            const blog = blogs.find(b => b.id === id);
+            if (blog) {
+                currentEditId = id;
+                document.getElementById('editTitle').value = blog.title;
+                document.getElementById('editCategory').value = blog.category;
+                document.getElementById('editContent').value = blog.content;
+                document.getElementById('editAuthor').value = blog.author;
+                openModal('editModal');
+            }
+        }
+
+        // Delete post
+        function deletePost(id) {
+            if (confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
+                blogs = blogs.filter(blog => blog.id !== id);
+                saveBlogsToStorage();
+                displayBlogs();
+                displayManageBlogs();
+                alert('Post deleted successfully!');
+            }
+        }
+
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            document.body.style.overflow = 'auto';
+            if (modalId === 'editModal') {
+                currentEditId = null;
+            }
+        }
+
+        // Close modal when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal(this.id);
+                }
+            });
+        });
+
+        // Storage functions
+        function saveBlogsToStorage() {
+            const blogData = JSON.stringify(blogs);
+            // Using a simple variable to store data instead of localStorage
+            window.blogStorage = blogData;
+        }
+
+        function loadBlogsFromStorage() {
+            try {
+                const stored = window.blogStorage;
+                if (stored) {
+                    blogs = JSON.parse(stored);
+                }
+            } catch (e) {
+                console.log('No stored blogs found');
+                blogs = [];
+            }
+        }
+
+        // Add sample data
+        function addSampleData() {
+            const sampleBlogs = [
+                {
+                    id: 1,
+                    title: "The Digital Divide: Bridging Technology Gaps in Education",
+                    category: "Technology & Society",
+                    content: "In our increasingly digital world, access to technology has become a fundamental requirement for quality education. However, millions of students worldwide still lack reliable internet access and digital devices, creating a significant barrier to learning opportunities.\n\nThis digital divide affects not just academic performance, but also future career prospects and social mobility. Students without access to digital tools are often left behind in a world that increasingly demands technological literacy.\n\nCommunity initiatives, government programs, and public-private partnerships are essential to address this challenge. We must work together to ensure that every student has the tools they need to succeed in the 21st century.",
+                    author: "Sarah Chen",
+                    date: new Date().toLocaleDateString(),
+                    timestamp: new Date().toISOString()
+                },
+                {
+                    id: 2,
+                    title: "Climate Action: Individual Responsibility vs. Systemic Change",
+                    category: "Environment",
+                    content: "The climate crisis requires action at every level of society. While individual actions like reducing consumption and choosing sustainable options are important, we must also acknowledge that systemic change is crucial for meaningful impact.\n\nCorporations and governments hold significant power to implement large-scale changes that can address the root causes of climate change. Carbon pricing, renewable energy investments, and sustainable infrastructure development are examples of systemic solutions that can create lasting change.\n\nHowever, individual actions still matter. They raise awareness, create market demand for sustainable products, and demonstrate public support for environmental policies. The key is finding the right balance between personal responsibility and advocating for systemic change.",
+                    author: "Marcus Rodriguez",
+                    date: new Date(Date.now() - 86400000).toLocaleDateString(),
+                    timestamp: new Date(Date.now() - 86400000).toISOString()
+                },
+                {
+                    id: 3,
+                    title: "Mental Health Awareness in the Workplace",
+                    category: "Healthcare",
+                    content: "Mental health in the workplace has gained significant attention in recent years, and for good reason. The traditional approach of keeping personal struggles separate from professional life is being challenged as we recognize the interconnected nature of our well-being.\n\nEmployers are beginning to understand that supporting employee mental health is not just the right thing to do—it's also good business. Stress, anxiety, and depression can significantly impact productivity, creativity, and job satisfaction.\n\nProgressive companies are implementing mental health days, providing access to counseling services, creating supportive work environments, and training managers to recognize signs of mental health struggles. These initiatives benefit everyone and help create more compassionate workplaces.",
+                    author: "Dr. Amanda Foster",
+                    date: new Date(Date.now() - 172800000).toLocaleDateString(),
+                    timestamp: new Date(Date.now() - 172800000).toISOString()
+                }
+            ];
+            
+            blogs = sampleBlogs;
+            saveBlogsToStorage();
+            displayBlogs();
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal.active').forEach(modal => {
+                    closeModal(modal.id);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
