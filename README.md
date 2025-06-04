@@ -32,7 +32,8 @@ The **Social Topics Blog Manager** is a single-page web application designed to 
 2. **Open the `index.html` file in a web browser** to run the application.
 
 ## **File Structure**
-
+├── index.html       
+└── README.md        
 ## Usage
 1. **Read Posts**:
    - Navigate to the "Read Posts" tab to view all blog posts.
